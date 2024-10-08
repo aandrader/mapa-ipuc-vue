@@ -4,4 +4,5 @@ export default defineNuxtConfig({
   modules: ["@unocss/nuxt"],
   srcDir: "src/",
   devtools: { enabled: true },
+  css: ["@unocss/reset/tailwind.css"],
 });
