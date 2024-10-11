@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import type { Map } from "leaflet";
 import "leaflet/dist/leaflet.css";
+import type { Map } from "leaflet";
+import type { fetchTempleIdType } from "~/server/queries";
 
-const { temples } = defineProps<{ temples: any[] }>();
+const temples = inject(templesKey)!;
+
+const mapId = useId();
 
 async function isLocationAllowed() {
   try {
@@ -23,8 +26,8 @@ function getCurrentPosition(): Promise<GeolocationPosition> {
 const setInitialView = async (map: Map) => {
   if (location.pathname !== "/") {
     const templeId = location.pathname.split("/").at(-1)!;
-    const { data } = await useFetch("/api/fetch-temples/" + templeId);
-    const coordenadas = data.value as any;
+    const { coordenadas } = await $fetch<fetchTempleIdType>("/api/fetch-temple/" + templeId);
+
     map.setView(coordenadas!, 16) as Map;
     map.locate({ enableHighAccuracy: true });
   } else if (await isLocationAllowed()) {
@@ -39,14 +42,14 @@ const setInitialView = async (map: Map) => {
 
 const initMap = async () => {
   const L = await import("leaflet");
-  const mapDiv = document.getElementById("map");
+  const mapDiv = document.getElementById(mapId);
   mapDiv?.classList.remove("skeleton");
 
-  const map = L.map("map", { zoomControl: false });
+  const map = L.map(mapId, { zoomControl: false });
   L.control.zoom({ position: "bottomright" }).addTo(map);
 
   map.on("locationfound", (e) => {
-    // setUserLocation([e.latlng.lat, e.latlng.lng]);
+    userLocation.value = [e.latlng.lat, e.latlng.lng];
     const icon = L.divIcon({ html: locationMarker, className: "" });
     L.marker([e.latlng.lat, e.latlng.lng], { icon: icon }).addTo(map);
     if (location.pathname === "/") map.flyTo(e.latlng, 13);
@@ -67,12 +70,45 @@ const initMap = async () => {
     });
     marker.addTo(map);
   }
+
+  mapRef.value = map;
 };
 
-//   map?.remove();
+const { map: mapRef, userLocation } = storeToRefs(useMapStore());
 onMounted(initMap);
+onUnmounted(() => {
+  mapRef.value?.remove();
+});
 </script>
 
 <template>
-  <div id="map" class="w-screen h-screen skeleton"></div>
+  <div :id="mapId" class="w-screen h-screen skeleton"></div>
 </template>
+
+<style scoped>
+.skeleton {
+  background-color: #ddd; /* Light gray color */
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(#dddddd 0%, #eee 50%, #dddddd 100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+</style>

@@ -10,6 +10,8 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxt/image": "^1.8.1",
+    "@pinia/nuxt": "^0.5.5",
     "drizzle-orm": "^0.29.5",
     "leaflet": "^1.9.4",
     "nuxt": "^3.13.0",
