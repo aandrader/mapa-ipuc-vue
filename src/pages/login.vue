@@ -1,3 +1,11 @@
+<script setup lang="ts">
+definePageMeta({
+  auth: {
+    unauthenticatedOnly: true,
+    navigateAuthenticatedTo: "/admin",
+  },
+});
+</script>
 <template>
   <div class="w-screen h-screen grid place-items-center bg-ipuc-blue-800">
     <NuxtLink

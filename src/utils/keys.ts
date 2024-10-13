@@ -5,3 +5,4 @@ export const drawerOpenKey = Symbol() as InjectionKey<{
   isOpen: Ref<boolean>;
   setIsOpen: (state: boolean) => void;
 }>;
+export const readOnlyKey = Symbol() as InjectionKey<Ref<boolean>>;

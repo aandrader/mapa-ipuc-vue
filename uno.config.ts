@@ -2,6 +2,7 @@ import { defineConfig, presetUno, presetAttributify } from "unocss";
 
 export default defineConfig({
   presets: [presetUno(), presetAttributify()],
+  rules: [["hidden", { display: "none" }]],
   shortcuts: {
     card: "bg-white rounded-3xl border border-solid border-gray-300",
     "absolute-center-x": "right-1/2  translate-x-[50%]",

@@ -21,11 +21,20 @@ watch(
   { immediate: true }
 );
 
-const submit = async () => {};
+const { signIn, status } = useAuth();
+
+const login = async () => {
+  await signIn("credentials", {
+    selectedDistrict: selectedDistrict.value,
+    selectedTemple: selectedTemple.value,
+    password: password.value,
+  });
+};
 </script>
 
 <template>
-  <form @submit.prevent="submit" class="flex flex-col gap-2">
+  {{ status }}
+  <form @submit.prevent="login" class="flex flex-col gap-2">
     <h1 class="text-center font-medium text-2xl text-white mb-2">Panel administrativo Mapa Ipuc</h1>
 
     <select v-model="selectedDistrict" class="rounded-lg px-2 w-full" required>
@@ -53,7 +62,11 @@ const submit = async () => {};
     />
 
     <!-- <ForgetPassword /> -->
-
+    <button
+      class="rounded-lg bg-white hover:bg-white/80 text-ipuc-blue-800 font-medium disabled:bg-slate-400"
+    >
+      Iniciar sesión
+    </button>
     <!-- <SubmitButton :pending="pending" /> -->
   </form>
 </template>
