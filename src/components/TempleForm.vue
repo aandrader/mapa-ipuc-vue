@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Map } from "leaflet";
 import type { fetchTempleIdType } from "~/server/queries";
 
 const { data } = useAuth();
@@ -9,24 +10,24 @@ const initial = ref({
   facebook: temple.value?.facebook ?? "",
   youtube: temple.value?.youtube ?? "",
   instagram: temple.value?.instagram ?? "",
-  pagina: temple.value?.pagina ?? "",
+  webpage: temple.value?.pagina ?? "",
   services: temple.value?.horarios ?? [],
+  coordinates: temple.value?.coordenadas ?? null,
 });
 
 const state = reactive(initial);
-const { facebook, youtube, instagram, pagina, services } = toRefs(state.value);
+const { facebook, youtube, instagram, webpage, services, coordinates } = toRefs(state.value);
 const readOnly = ref(true);
 
 provide(readOnlyKey, readOnly);
 
+const mapRef = ref<Map>();
+
 const onReset = () => {
-  //   e.preventDefault();
-  //   e.target?.closest("form").reset();
   state.value = initial.value;
   // setImageUrl(initialImg);
   // if (imageUrl) URL.revokeObjectURL(imageUrl);
-  // setTempleLocation(initialCoordinates);
-  // if (map) map.fire("refresh", { templeLocation: initialCoordinates });
+  if (mapRef.value) mapRef.value.fire("refresh", { templeLocation: initial.value.coordinates });
   readOnly.value = true;
 };
 
@@ -58,18 +59,18 @@ const onSubmit = () => {
       <InputLabel label="Link de página de Facebook" v-model="facebook" />
       <InputLabel label="Link de página de Youtube" v-model="youtube" />
       <InputLabel label="Link de Instagram" v-model="instagram" />
-      <InputLabel label="Link de página general" v-model="pagina" />
+      <InputLabel label="Link de página general" v-model="webpage" />
       <Schedule v-model="services" />
     </div>
 
-    <!-- <div class="flex flex-col gap-4 pb-2">
-        <FormMap map={map} templeLocation={templeLocation} readOnly={readOnly} />
-        <TemplePhoto
+    <div class="flex flex-col gap-4 pb-2">
+      <AdminMap :mapRef="mapRef" :templeLocation="coordinates" />
+      <!-- <TemplePhoto
           imageUrl={imageUrl}
           readOnly={readOnly}
           setImageBlob={setImageBlob}
           setImageUrl={setImageUrl}
-        />
-      </div> -->
+        /> -->
+    </div>
   </form>
 </template>
